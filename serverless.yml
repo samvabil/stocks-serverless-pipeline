@@ -1,21 +1,33 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: samvabi
-# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
 app: stocks-serverless-pipeline
-# "service" is the name of this project. This will also be added to your AWS resource names.
 service: stocks-serverless-pipeline
 
 provider:
   name: aws
   runtime: python3.12
-  # Uncomment to easily set up a custom domain. Read the docs for more details:
-  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
-  # domain: api.example.com
+  environment:
+    MOVERS_TABLE: stock-movers-${sls:stage}
 
 functions:
   hello:
-    handler: handler.hello
+    handler: backend/handlers/hello.handler
     events:
       - httpApi:
-          path: /
+          path: /hello
           method: get
+
+resources:
+  Resources:
+    MoversTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: stock-movers-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: date
+            AttributeType: S
+        KeySchema:
+          - AttributeName: date
+            KeyType: HASH
+
+
