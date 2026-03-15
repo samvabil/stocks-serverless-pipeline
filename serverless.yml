@@ -9,12 +9,17 @@ provider:
     MOVERS_TABLE: stock-movers-${sls:stage}
 
 functions:
-  hello:
-    handler: backend/handlers/hello.handler
+  retrieve:
+    handler: backend/handlers/retrieve.handler
     events:
       - httpApi:
-          path: /hello
+          path: /movers
           method: get
+
+  ingest:
+    handler: backend/handlers/ingest.handler
+    events:
+      - schedule: rate(1 day)
 
 resources:
   Resources:
