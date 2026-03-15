@@ -20,7 +20,7 @@ def get_daily_open_close(ticker: str, date_str: str, max_retries: int = 2) -> di
             response = requests.get(url, params=params, timeout=5)
 
             if response.status_code == 429:
-                # basic retry for rate limiting
+                last_error = f"Rate limited with status 429 on attempt {attempt}"
                 time.sleep(attempt)
                 continue
 
@@ -28,9 +28,11 @@ def get_daily_open_close(ticker: str, date_str: str, max_retries: int = 2) -> di
             data = response.json()
 
             if data.get("status") != "OK":
+                last_error = f"Massive returned non-OK status: {data}"
                 raise ValueError(f"Massive returned non-OK status for {ticker}: {data}")
 
             if "open" not in data or "close" not in data:
+                last_error = f"Missing open/close data: {data}"
                 raise ValueError(f"Missing open/close for {ticker} on {date_str}: {data}")
 
             return {
@@ -41,14 +43,14 @@ def get_daily_open_close(ticker: str, date_str: str, max_retries: int = 2) -> di
             }
 
         except requests.RequestException as exc:
-            last_error = exc
+            last_error = str(exc)
             if attempt < max_retries:
                 time.sleep(attempt)
                 continue
             raise
 
         except Exception as exc:
-            last_error = exc
+            last_error = str(exc)
             raise
 
     raise RuntimeError(f"Failed to fetch {ticker} for {date_str}: {last_error}")
