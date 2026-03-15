@@ -1,6 +1,8 @@
 # Retrieval Lambda
 # read last 7 days from Dynamodb, return JSON
 
+# convert Decimal back to float or str before returning JSON
+
 import json
 
 def handler(event, context):

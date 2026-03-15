@@ -5,21 +5,37 @@ service: stocks-serverless-pipeline
 provider:
   name: aws
   runtime: python3.12
+
   environment:
+    STOCK_API_KEY: ${env:STOCK_API_KEY}
     MOVERS_TABLE: stock-movers-${sls:stage}
+    
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/stock-movers-${sls:stage}
+
+custom:
+  pythonRequirements:
+    fileName: backend/requirements.txt
 
 functions:
+  ingest:
+    handler: backend/handlers/ingest.handler
+    timeout: 30
+    events:
+      - schedule: rate(1 day)
+
   retrieve:
     handler: backend/handlers/retrieve.handler
     events:
       - httpApi:
           path: /movers
           method: get
-
-  ingest:
-    handler: backend/handlers/ingest.handler
-    events:
-      - schedule: rate(1 day)
 
 resources:
   Resources:
