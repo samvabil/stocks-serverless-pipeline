@@ -1,14 +1,17 @@
 import os
 import boto3
 from decimal import Decimal
+from boto3.dynamodb.conditions import Key
 
 TABLE_NAME = os.environ["MOVERS_TABLE"]
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
+WINNERS_PARTITION_KEY = "WINNER"
 
 def save_winner(item: dict) -> None:
     """Writes stock with largest absolute movement to DynamoDB."""
     dynamo_item = {
+        "pk": WINNERS_PARTITION_KEY,
         "date": item["date"],
         "ticker": item["ticker"],
         "percentChange": Decimal(str(item["percentChange"])),
@@ -19,11 +22,12 @@ def save_winner(item: dict) -> None:
 
 def get_recent_winners(limit: int = 7) -> list[dict]:
     """
-    Gets all items from DynamoDB, sorts by date descending,
-    and returns the most recent `limit` items.
+    Queries the winners partition by date descending and returns
+    the most recent `limit` items.
     """
-    response = table.scan()
-    items = response.get("Items", [])
-
-    sorted_items = sorted(items, key=lambda item: item["date"], reverse=True)
-    return sorted_items[:limit]
+    response = table.query(
+        KeyConditionExpression=Key("pk").eq(WINNERS_PARTITION_KEY),
+        ScanIndexForward=False,
+        Limit=limit
+    )
+    return response.get("Items", [])
