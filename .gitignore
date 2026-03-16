@@ -19,3 +19,6 @@ var/
 # Serverless directories
 .serverless
 .env
+backend/__pycache__/
+backend/handlers/__pycache__/
+backend/services/__pycache__/

@@ -1,6 +1,7 @@
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 
 def load_dotenv() -> None:
@@ -20,14 +21,15 @@ def load_dotenv() -> None:
 
 load_dotenv()
 os.environ.setdefault("MOVERS_TABLE", "stock-movers-dev")
+BACKFILL_TIMEZONE = os.environ.setdefault("BACKFILL_TIMEZONE", "America/Chicago")
 
 from backend.handlers.ingest import handler as ingest_handler
 
 
 def get_recent_business_days(count: int) -> list[str]:
-    """Returns today plus the previous business days in YYYY-MM-DD format."""
+    """Returns the most recent local business days in YYYY-MM-DD format."""
     dates: list[str] = []
-    current = datetime.now(timezone.utc).date()
+    current = datetime.now(ZoneInfo(BACKFILL_TIMEZONE)).date()
 
     while len(dates) < count:
         if current.weekday() < 5:
