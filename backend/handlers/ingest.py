@@ -5,7 +5,7 @@ from backend.services.stock_api import get_daily_open_close
 from backend.services.mover_logic import calculate_percent_change, pick_top_mover
 from backend.services.db import save_winner
 
-WATCHLIST = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA"]
+WATCHLIST = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"]
 
 def get_target_date(event: dict) -> str:
     """
@@ -14,7 +14,12 @@ def get_target_date(event: dict) -> str:
     Otherwise, defaults to today's date 
     """
     if event and event.get("date"):
-        return event["date"]
+        date_str = event["date"]
+        try:
+            parsed = datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("date must be in YYYY-MM-DD format")
+        return parsed.strftime("%Y-%m-%d")
 
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 

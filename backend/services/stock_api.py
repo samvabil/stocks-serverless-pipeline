@@ -44,8 +44,11 @@ def get_daily_open_close(ticker: str, date_str: str, max_retries: int = DEFAULT_
             data = response.json()
 
             if data.get("status") != "OK":
-                last_error = f"Massive returned non-OK status: {data}"
-                raise ValueError(f"Massive returned non-OK status for {ticker}: {data}")
+                last_error = (
+                    f"Massive returned status={data.get('status')} "
+                    f"message={data.get('message')} for {ticker} on {date_str}"
+                )
+                raise ValueError(last_error)
 
             if "open" not in data or "close" not in data:
                 last_error = f"Missing open/close data: {data}"
