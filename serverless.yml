@@ -2,9 +2,21 @@ org: samvabi
 app: stocks-serverless-pipeline
 service: stocks-serverless-pipeline
 
+plugins:
+  - serverless-s3-sync
+
 provider:
   name: aws
   runtime: python3.12
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'
+      allowedHeaders:
+        - Content-Type
+      allowedMethods:
+        - GET
+        - OPTIONS
 
   environment:
     STOCK_API_KEY: ${env:STOCK_API_KEY}
@@ -21,8 +33,13 @@ provider:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/stock-movers-${sls:stage}
 
 custom:
+  frontendBucketName: ${self:service}-${sls:stage}-frontend-${aws:accountId}
   pythonRequirements:
     fileName: backend/requirements.txt
+  s3Sync:
+    - bucketName: ${self:custom.frontendBucketName}
+      localDir: frontend
+      deleteRemoved: true
 
 functions:
   ingest:
@@ -57,3 +74,34 @@ resources:
             KeyType: HASH
           - AttributeName: date
             KeyType: RANGE
+    FrontendBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.frontendBucketName}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          IgnorePublicAcls: false
+          BlockPublicPolicy: false
+          RestrictPublicBuckets: false
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+    FrontendBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref FrontendBucket
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action: s3:GetObject
+              Resource: !Sub arn:aws:s3:::${FrontendBucket}/*
+  Outputs:
+    FrontendBucketName:
+      Value: !Ref FrontendBucket
+    FrontendWebsiteUrl:
+      Value: !GetAtt FrontendBucket.WebsiteURL
+    MoversApiUrl:
+      Value: !Sub https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/movers
