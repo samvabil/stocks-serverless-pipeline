@@ -16,7 +16,6 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:PutItem
-            - dynamodb:GetItem
             - dynamodb:Query
           Resource:
             - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/stock-movers-${sls:stage}

@@ -21,7 +21,8 @@ def get_target_date(event: dict) -> str:
             raise ValueError("date must be in YYYY-MM-DD format")
         return parsed.strftime("%Y-%m-%d")
 
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    eastern_now = datetime.now(ZoneInfo("America/New_York"))
+    return eastern_now.strftime("%Y-%m-%d")
 
 def handler(event, context):
     try:
