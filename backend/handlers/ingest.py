@@ -1,5 +1,6 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from backend.services.stock_api import get_daily_open_close
 from backend.services.mover_logic import calculate_percent_change, pick_top_mover
@@ -11,7 +12,7 @@ def get_target_date(event: dict) -> str:
     """
     Allows manual testing/backfilling
         serverless invoke -f ingest --data '{"date":"YYYY-MM-DD"}'
-    Otherwise, defaults to today's date 
+    Otherwise, defaults to today's date
     """
     if event and event.get("date"):
         date_str = event["date"]
