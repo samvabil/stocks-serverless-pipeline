@@ -30,7 +30,9 @@ functions:
     handler: backend/handlers/ingest.handler
     timeout: 30
     events:
-      - schedule: rate(1 day)
+      - schedule:
+          rate: cron(15 0 ? * TUE-SAT *)
+          enabled: true
 
   retrieve:
     handler: backend/handlers/retrieve.handler
