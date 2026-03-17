@@ -7,14 +7,14 @@ from backend.services.db import get_recent_winners
 def convert_decimals(item: dict) -> dict:
     """
     Converts DynamoDB Decimal values into JSON-safe Python floats
+    Removes pk from response
     """
     converted = {}
 
     for key, value in item.items():
-        if isinstance(value, Decimal):
-            converted[key] = float(value)
-        else:
-            converted[key] = value
+        if key == "pk":
+            continue
+        converted[key] = float(value) if isinstance(value, Decimal) else value
 
     return converted
 
