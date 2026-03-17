@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Top Stock Movers</title>
+    <meta
+      name="description"
+      content="Track the most recent top stock mover and review the last 7 market days."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero" aria-labelledby="summary-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Most recent completed market day</p>
+          <p id="latest-date" class="latest-date">Loading...</p>
+          <h1 id="summary-title" class="summary-title">Top mover</h1>
+          <p id="company-line" class="company-line">Fetching market data</p>
+        </div>
+
+        <article class="summary-card" aria-live="polite">
+          <div class="summary-header">
+            <p class="summary-label">Company</p>
+            <h2 id="company-name" class="company-name">--</h2>
+            <p id="ticker-name" class="ticker-name">--</p>
+          </div>
+
+          <dl class="metrics-grid">
+            <div class="metric">
+              <dt>Percent change</dt>
+              <dd id="percent-change" class="metric-value">--</dd>
+            </div>
+            <div class="metric">
+              <dt>Closing price</dt>
+              <dd id="closing-price" class="metric-value">--</dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+
+      <section class="history-section" aria-labelledby="history-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">History</p>
+            <h2 id="history-title">Past 7 market days</h2>
+          </div>
+          <p class="section-copy">The latest available close appears first.</p>
+        </div>
+
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Company</th>
+                <th scope="col">Ticker</th>
+                <th scope="col">% Change</th>
+                <th scope="col">Close</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr>
+                <td colspan="5" class="table-status">Loading market history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p id="status-message" class="status-message" role="status"></p>
+    </main>
+
+    <script>
+      window.MOVERS_API_URL = "https://2sfrxohtdi.execute-api.us-east-1.amazonaws.com/movers";
+    </script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>

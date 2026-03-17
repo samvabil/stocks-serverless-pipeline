@@ -1,0 +1,11 @@
+{
+  "name": "stocks-serverless-pipeline",
+  "private": true,
+  "scripts": {
+    "deploy": "serverless deploy",
+    "remove": "serverless remove"
+  },
+  "devDependencies": {
+    "serverless-s3-sync": "^3.4.0"
+  }
+}
